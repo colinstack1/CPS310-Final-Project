@@ -2,7 +2,7 @@
 
 import json
 
-from recipe_utils import filter_by_category, load_config, load_recipes, search_by_name, search_by_ingredient
+from recipe_utils import filter_by_category, load_config, load_recipes, search_by_name, search_by_ingredient, suggest_random_meal
 
 
 def test_search_by_name_finds_partial_match():
@@ -122,3 +122,25 @@ def test_search_by_ingredient_empty_search():
 def test_search_by_ingredient_whitespace():
     results = search_by_ingredient(INGREDIENT_TEST_RECIPES, "  eggs  ")
     assert len(results) == 1
+
+def test_random_meal_returns_valid_recipe():
+    result = suggest_random_meal(INGREDIENT_TEST_RECIPES)
+    assert result in INGREDIENT_TEST_RECIPES
+
+
+def test_random_meal_empty_collection():
+    assert suggest_random_meal([]) is None
+
+
+def test_random_meal_single_recipe():
+    recipes = [{"name": "Chicken Pasta"}]
+    assert suggest_random_meal(recipes) == recipes[0]
+
+
+def test_random_meal_does_not_modify_collection():
+    recipes = [{"name": "Pasta"}, {"name": "Salad"}]
+    original = [{"name": "Pasta"}, {"name": "Salad"}]
+
+    suggest_random_meal(recipes)
+
+    assert recipes == original
