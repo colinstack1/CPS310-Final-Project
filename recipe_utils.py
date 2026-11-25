@@ -1,6 +1,6 @@
 """Utility functions for the Recipe & Meal Planner."""
 
-import json
+import json, random
 
 
 def load_config(filename):
@@ -49,3 +49,10 @@ def search_by_ingredient(recipes, search_term):
             for ingredient in recipe["ingredients"]
         )
     ]
+
+def suggest_random_meal(recipes):
+    """Return a randomly selected recipe."""
+    if not recipes:
+        return None
+
+    return random.choice(recipes)
