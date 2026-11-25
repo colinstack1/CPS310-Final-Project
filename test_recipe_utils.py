@@ -2,7 +2,7 @@
 
 import json
 
-from recipe_utils import filter_by_category, load_config, load_recipes, search_by_name
+from recipe_utils import filter_by_category, load_config, load_recipes, search_by_name, search_by_ingredient
 
 
 def test_search_by_name_finds_partial_match():
@@ -79,3 +79,46 @@ def test_load_recipes_reads_json(tmp_path):
     ]
     recipe_file.write_text(json.dumps(sample), encoding="utf-8")
     assert load_recipes(recipe_file) == sample
+
+
+
+INGREDIENT_TEST_RECIPES = [
+    {
+        "name": "Veggie Omelet",
+        "ingredients": [{"name": "Eggs"}, {"name": "Spinach"}],
+    },
+    {
+        "name": "Chicken Pasta",
+        "ingredients": [{"name": "Chicken Breast"}, {"name": "Pasta"}],
+    },
+]
+
+
+def test_search_by_ingredient_finds_match():
+    results = search_by_ingredient(INGREDIENT_TEST_RECIPES, "Eggs")
+    assert len(results) == 1
+    assert results[0]["name"] == "Veggie Omelet"
+
+
+def test_search_by_ingredient_partial_match():
+    results = search_by_ingredient(INGREDIENT_TEST_RECIPES, "chick")
+    assert len(results) == 1
+    assert results[0]["name"] == "Chicken Pasta"
+
+
+def test_search_by_ingredient_case_insensitive():
+    results = search_by_ingredient(INGREDIENT_TEST_RECIPES, "EGGS")
+    assert len(results) == 1
+
+
+def test_search_by_ingredient_no_match():
+    assert search_by_ingredient(INGREDIENT_TEST_RECIPES, "banana") == []
+
+
+def test_search_by_ingredient_empty_search():
+    assert search_by_ingredient(INGREDIENT_TEST_RECIPES, "") == []
+
+
+def test_search_by_ingredient_whitespace():
+    results = search_by_ingredient(INGREDIENT_TEST_RECIPES, "  eggs  ")
+    assert len(results) == 1
